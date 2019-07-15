@@ -1,0 +1,45 @@
+---
+
+# 14-JUL-2019, ALQ
+# Privates Projekt OpenNetworking
+
+- hosts: leaf01
+  name: setup git, pip und netlink
+  become: yes
+  tasks:
+
+    - name: Installieren git
+      apt:
+        name: git
+        state: present
+
+    - name: Installieren pip
+      apt:
+        name: python-pip
+        state: present
+
+#    - name: Installieren netlink
+#      command: "pip install nlmanager"
+#      args:
+#        chdir: /home/cumulus
+
+
+- hosts: leaf02
+  name: setup git, pip und netlink
+  become: yes
+  tasks:
+
+    - name: Installieren git
+      apt:
+        name: git
+        state: present
+
+    - name: Installieren pip
+      apt:
+        name: python-pip
+        state: present
+
+    - name: Installieren netlink
+      command: "pip install nlmanager"
+      args:
+        chdir: /home/cumulus

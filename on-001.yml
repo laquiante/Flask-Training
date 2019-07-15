@@ -1,0 +1,140 @@
+---
+
+# 14-JUL-2019, ALQ
+# Privates Projekt OpenNetworking
+
+# Spine01  IF Datei
+
+- hosts: spine01
+  name: Konfiguration der IF 
+  become: yes
+  tasks:
+    - name: IFs for BGP unnumbered
+      copy: 
+        src: /home/cumulus/on/on-001/on-spine01-001 
+        dest: /etc/network/interfaces
+    # aktivieren
+    - name: Durchstarten der Schnittstelle
+      shell: /sbin/ifreload -a
+      
+# Leaf01   IF Datei
+
+- hosts: leaf01
+  name: IFs for BGP unnumbered
+  become: yes
+  tasks:
+    - name: IFs for BGP unmumbered
+      copy:
+        src: /home/cumulus/on/on-001/on-leaf01-001
+        dest: /etc/network/interfaces
+    # aktivieren
+    - name: Durchstarten der Schnittstelle
+      shell: /sbin/ifreload -a
+
+# Leaf02   IF Datei
+
+- hosts: leaf02
+  name: IFs for BGP unnumbered
+  become: yes
+  tasks:
+    - name: cleaning IF for BGP unnumbered
+      copy:
+        src: /home/cumulus/on/on-001/on-leaf02-001
+        dest: /etc/network/interfaces
+    # aktivieren
+    - name: Durchstarten der Schnittstelle
+      shell: /sbin/ifreload -a
+
+# Server01 IF Datei
+# Server02 IF Datei
+
+# Einspielen der Routing Daemon
+# und "restart" des FRR-Daemons
+
+- hosts: switches
+  name: Configure /etc/frr/daemon
+  become: yes
+  tasks:
+    - copy:
+        src: /home/cumulus/on/on-001/daemons
+        dest: /etc/frr/daemons
+      notify:
+        - frr_restart
+
+    - name: frr_restart
+      service:
+        name=frr
+        state=restarted
+        enabled=yes
+      listen: "frr_restart"
+
+# Einspielen der Router Konfiguration
+# und "reloading" des FRR-Daemons
+
+- hosts: spine01
+  name: Configure /etc/frr/frr.conf
+  become: yes
+  tasks:
+    - name: Entfernen der alten Datei
+      file:
+        path: '/etc/frr.conf'
+        state: absent
+
+    - copy:
+        src: /home/cumulus/on/on-001/frr_spine01
+        dest: /etc/frr/frr.conf
+      notify:
+        - frr_reload
+
+  handlers:
+    - name: frr_reload
+      service:
+        name=frr
+        state=reloaded
+      listen: "frr_reload"
+
+- hosts: leaf01
+  name: Configure /etc/frr/frr.conf
+  become: yes
+  tasks:
+
+    - name: Entfernen der alten Datei
+      file:
+        path: '/etc/frr/frr.conf'
+        state: absent
+    - copy:
+        src: /home/cumulus/on/on-001/frr_leaf01
+        dest: /etc/frr/frr.conf
+      notify:
+        - frr_reload
+
+  handlers:
+    - name: frr_reload
+      service:
+        name=frr
+        state=reloaded
+      listen: "frr_reload"
+
+- hosts: leaf02
+  name: Configure /etc/frr/frr.conf
+  become: yes
+  tasks:
+
+    - name: Entfernen der alten Datei
+      file:
+        path: '/etc/frr/frr.conf'
+        state: absent
+
+    - copy:
+        src: /home/cumulus/on/on-001/frr_leaf02
+        dest: /etc/frr/frr.conf
+      notify:
+        - frr_reload
+
+  handlers:
+    - name: frr_reload
+      service:
+        name=frr
+        state=reloaded
+      listen: "frr_reload"
+

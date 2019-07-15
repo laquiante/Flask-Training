@@ -1,0 +1,42 @@
+
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# 14-JUL-2019, ALQ
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+  address 10.0.0.11/32
+
+# The primary network interface
+auto eth0
+iface eth0 inet dhcp
+
+auto swp1
+iface swp1
+    bridge-access 10
+
+auto swp51
+iface swp51
+
+auto vni-10
+iface vni-10
+    vxlan-id 10010
+    vxlan-local-tunnelip 10.0.0.11
+    bridge-access 10
+    vxlan-remoteip 10.0.0.12
+
+auto bridge
+iface bridge
+    bridge-ports swp1 vni-10
+    bridge-vids 1 10 20
+    bridge-vlan-aware yes
+
+auto vlan10
+iface vlan10
+    address 192.168.10.1/24
+    address-virtual 00:00:00:00:00:0A 192.168.10.254/24
+    vlan-id 10
+    vlan-raw-device bridge
+

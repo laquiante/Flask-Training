@@ -1,0 +1,23 @@
+hostname spine01
+username cumulus nopassword
+!
+service integrated-vtysh-config
+!
+log syslog informational
+!
+interface swp1
+!
+interface swp2
+!
+router bgp 65000
+ bgp router-id 10.0.0.1
+ neighbor swp1 interface remote-as external
+ neighbor swp2 interface remote-as external
+ !
+ address-family ipv4 unicast
+  redistribute connected
+ exit-address-family
+
+!
+
+

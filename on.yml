@@ -1,0 +1,13 @@
+---
+
+# 14-JUL-2019, ALQ
+# Privates Projekt OpenNetworking
+
+# Playbook to prepare BGP unnumbered for leaf01, spine01, and leaf02
+# - import_playbook: on-001.yml
+
+# Playbook to prepre netlink on leaf01 and leaf02
+- import_playbook: on-002.yml
+
+# Playbook to install ngrok
+- import_playbook: on-003.yml
